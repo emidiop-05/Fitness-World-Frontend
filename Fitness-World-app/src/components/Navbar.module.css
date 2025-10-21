@@ -1,4 +1,39 @@
-#logo {
-  height: 200px;
+.Navbar {
+  display: flex;
+  align-items: center;
+}
+
+.Logo {
+  height: 50px;
   width: auto;
+  padding-left: 30px;
+  padding-top: 10px;
+}
+.NavbarRoutes {
+  display: flex;
+  gap: 25px;
+  padding-left: 50px;
+  padding-top: 20px;
+}
+
+.Home {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: white;
+}
+
+.Home a {
+  text-decoration: none;
+}
+
+.Plans {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: white;
+}
+
+.Plans a {
+  text-decoration: none;
 }
