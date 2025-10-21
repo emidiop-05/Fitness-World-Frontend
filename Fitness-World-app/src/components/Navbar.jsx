@@ -1,11 +1,15 @@
 import Logo from "../assets/Logo.png";
 import styles from "../components/Navbar.module.css";
 import { Link } from "react-router-dom";
-function Navbar() {
+import HamburgerMenu from "../assets/Hamburger_Menu-removebg-preview.png";
+
+function Navbar({ toggleSidebar }) {
   return (
     <nav className={styles.Navbar}>
       <img className={styles.Logo} src={Logo} alt="Logo" />
-
+      <button className={styles.HamburgerBtn} onClick={toggleSidebar}>
+        <img className={styles.Hamburger} src={HamburgerMenu} alt="" />
+      </button>
       <div className={styles.NavbarRoutes}>
         <Link to="/">
           <h1 className={styles.Home}>Home</h1>

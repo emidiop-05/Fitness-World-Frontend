@@ -13,6 +13,19 @@ body {
   padding-left: 30px;
   padding-top: 10px;
 }
+.HamburgerBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.Hamburger {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  right: 0;
+  top: 0;
+}
 .NavbarRoutes {
   display: flex;
   gap: 35px;
@@ -24,53 +37,58 @@ body {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: white;
+  color: #f3eaea;
 }
 
-.Home a {
-  text-decoration: none;
+.Home:hover {
+  color: #c9c9c9;
+  transform: scale(1.05);
 }
 
 .Plans {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: white;
+  color: #f3eaea;
 }
 
-.Plans a {
-  text-decoration: none;
+.Plans:hover {
+  color: #c9c9c9;
+  transform: scale(1.05);
 }
 
 .About {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: white;
+  color: #f3eaea;
 }
 
-.About a {
-  text-decoration: none;
+.About:hover {
+  color: #c9c9c9;
+  transform: scale(1.05);
 }
 
 .Blog {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: white;
+  color: #f3eaea;
 }
 
-.Blog a {
-  text-decoration: none;
+.Blog:hover {
+  color: #c9c9c9;
+  transform: scale(1.05);
 }
 
 .OurTeam {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: white;
+  color: #f3eaea;
 }
 
-.OurTeam a {
-  text-decoration: none;
+.OurTeam:hover {
+  color: #c9c9c9;
+  transform: scale(1.05);
 }

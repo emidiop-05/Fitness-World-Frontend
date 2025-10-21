@@ -1,0 +1,112 @@
+.FormContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* fills the whole screen */
+  background: linear-gradient(
+    to bottom,
+    #393061 17%,
+    #584893 73%,
+    #6474bd 100%
+  );
+}
+
+.Form {
+  width: 620px;
+  margin: 24px;
+  padding: 24px;
+  border-radius: 12px;
+  background: #f9f2d7;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-family: "Inter", sans-serif;
+}
+
+.Title {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #141829;
+}
+
+.Field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.Row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+label {
+  font-size: 13px;
+  color: #4a4f6a;
+}
+
+input,
+select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #d9dbe8;
+  border-radius: 10px;
+  background: #f8f9ff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #7b87f8;
+  box-shadow: 0 0 0 3px rgba(123, 135, 248, 0.2);
+  background: #fff;
+}
+
+.Submit {
+  margin-top: 8px;
+  height: 44px;
+  border: none;
+  border-radius: 10px;
+  background: #141829;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.Submit:hover {
+  background: #1e2442;
+  transform: translateY(-1px);
+}
+.Submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.MsgOk {
+  color: #1b8f3a;
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+.MsgError {
+  color: #c0342b;
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+/* Mobile tweak */
+@media (max-width: 520px) {
+  .Form {
+    margin: 16px;
+    padding: 16px;
+  }
+  .Row {
+    grid-template-columns: 1fr;
+  }
+}

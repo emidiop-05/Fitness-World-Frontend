@@ -1,11 +1,22 @@
 body {
   background: linear-gradient(
     to bottom,
-    #2c244e 17%,
-    #483b79 73%,
-    #5462a2 100%
+    #393061 17%,
+    #584893 73%,
+    #6474bd 100%
   );
   min-height: 100vh;
+}
+
+.BackgroundImg {
+  position: absolute;
+  top: 70px;
+  right: 40px;
+  width: 750px;
+  height: 600px;
+  border-radius: 15px;
+  z-index: 1;
+  box-shadow: 5px 5px 20px rgb(33, 33, 33);
 }
 
 .Tittle {
@@ -31,12 +42,43 @@ body {
   z-index: 5;
 }
 
-.BackgroundImg {
-  position: absolute;
-  top: 70px;
-  right: 40px;
-  width: 750px;
-  height: 600px;
-  border-radius: 15px;
-  z-index: 1;
+.Btns {
+  display: flex;
+  gap: 60px;
+  padding-top: 30px;
+  padding-left: 130px;
+}
+
+.About {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: #141829;
+  background-color: #f3eaea;
+  border-radius: 10px;
+  padding: 20px 70px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.About:hover {
+  background-color: #c9c9c9;
+  transform: scale(1.05);
+}
+
+.OurTeam {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: #141829;
+  background-color: #f3bb24;
+  border-radius: 10px;
+  padding: 20px 70px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.OurTeam:hover {
+  background-color: #ef9d22;
+  transform: scale(1.05);
 }
