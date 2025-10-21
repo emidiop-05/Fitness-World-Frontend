@@ -1,0 +1,42 @@
+body {
+  background: linear-gradient(
+    to bottom,
+    #2c244e 17%,
+    #483b79 73%,
+    #5462a2 100%
+  );
+  min-height: 100vh;
+}
+
+.Tittle {
+  position: relative;
+  font-size: 60px;
+  width: 700px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: #f3bb24;
+  padding-left: 30px;
+  padding-top: 150px;
+  z-index: 5;
+}
+
+.SubTittle {
+  position: relative;
+  font-size: 17px;
+  width: 700px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: #141829;
+  padding-left: 30px;
+  z-index: 5;
+}
+
+.BackgroundImg {
+  position: absolute;
+  top: 70px;
+  right: 40px;
+  width: 750px;
+  height: 600px;
+  border-radius: 15px;
+  z-index: 1;
+}

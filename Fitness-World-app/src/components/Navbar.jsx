@@ -13,6 +13,15 @@ function Navbar() {
         <Link to="/plans">
           <h1 className={styles.Plans}>Plans</h1>
         </Link>
+        <Link to="/about">
+          <h1 className={styles.About}>About</h1>
+        </Link>
+        <Link to="/blog">
+          <h1 className={styles.Blog}>Blog</h1>
+        </Link>
+        <Link to="/OurTeam">
+          <h1 className={styles.OurTeam}>Our Team</h1>
+        </Link>
       </div>
     </nav>
   );

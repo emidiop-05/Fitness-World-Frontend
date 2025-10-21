@@ -1,3 +1,7 @@
+body {
+  background-color: #2c244e;
+}
+
 .Navbar {
   display: flex;
   align-items: center;
@@ -11,7 +15,7 @@
 }
 .NavbarRoutes {
   display: flex;
-  gap: 25px;
+  gap: 35px;
   padding-left: 50px;
   padding-top: 20px;
 }
@@ -35,5 +39,38 @@
 }
 
 .Plans a {
+  text-decoration: none;
+}
+
+.About {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: white;
+}
+
+.About a {
+  text-decoration: none;
+}
+
+.Blog {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: white;
+}
+
+.Blog a {
+  text-decoration: none;
+}
+
+.OurTeam {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: white;
+}
+
+.OurTeam a {
   text-decoration: none;
 }
