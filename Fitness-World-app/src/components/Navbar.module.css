@@ -92,3 +92,21 @@ body {
   color: #c9c9c9;
   transform: scale(1.05);
 }
+
+.LogoutBtn {
+  background: transparent;
+  border: 1px solid #f3bb24;
+  border-radius: 10px;
+  color: #f3bb24;
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  padding: 10px 25px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.LogoutBtn:hover {
+  background: #f3bb24;
+  color: #141829;
+}
