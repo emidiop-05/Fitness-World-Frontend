@@ -1,17 +1,24 @@
 import { useState } from "react";
 import style from "../components/SignUpForm.module.css";
+
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
+const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/847/847969.png"; // matches your default style
 
 export default function SignUpForm() {
   const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    nickName: "",
     email: "",
     password: "",
     birthday: "",
     gender: "",
     countryCode: "",
+    profileImage: "", // NEW
   });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
+  const [imgError, setImgError] = useState(false);
 
   const countries = [
     { code: "AF", name: "Afghanistan" },
@@ -170,6 +177,7 @@ export default function SignUpForm() {
     setLoading(true);
     setMsg(null);
     try {
+      // 1) Create user (send profileImage too)
       const res = await fetch(`${API_BASE}/api/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -177,14 +185,38 @@ export default function SignUpForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Sign up failed");
-      setMsg({ type: "success", text: `User created: ${data.email}` });
+
+      // 2) Auto-login
+      const loginRes = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email, password: form.password }),
+      });
+      const loginData = await loginRes.json();
+      if (!loginRes.ok) throw new Error(loginData.error || "Auto-login failed");
+
+      localStorage.setItem("token", loginData.token);
+
+      setMsg({
+        type: "success",
+        text: `Welcome, ${
+          loginData.user?.firstName || data.firstName || "user"
+        }!`,
+      });
+
+      // Reset
       setForm({
+        firstName: "",
+        lastName: "",
+        nickName: "",
         email: "",
         password: "",
         birthday: "",
         gender: "",
         countryCode: "",
+        profileImage: "",
       });
+      setImgError(false);
     } catch (err) {
       setMsg({ type: "error", text: err.message });
     } finally {
@@ -196,6 +228,85 @@ export default function SignUpForm() {
     <div className={style.FormContainer}>
       <form onSubmit={onSubmit} className={style.Form}>
         <h2 className={style.Title}>Create account</h2>
+
+        {/* Profile image URL + preview */}
+        <div className={style.Field}>
+          <label htmlFor="profileImage">Profile Image URL (optional)</label>
+          <input
+            id="profileImage"
+            name="profileImage"
+            type="url"
+            placeholder="https://example.com/avatar.jpg"
+            value={form.profileImage}
+            onChange={(e) => {
+              setImgError(false);
+              onChange(e);
+            }}
+          />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              marginTop: 10,
+            }}
+          >
+            <img
+              src={
+                imgError || !form.profileImage ? PLACEHOLDER : form.profileImage
+              }
+              alt="Preview"
+              onError={() => setImgError(true)}
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                objectFit: "cover",
+                border: "1px solid #e5e7eb",
+              }}
+            />
+            <small style={{ color: "#6b7280" }}>
+              Paste an image URL. If empty or invalid, we’ll use a default
+              avatar.
+            </small>
+          </div>
+        </div>
+
+        <div className={style.Field}>
+          <label htmlFor="nickName">Nick Name</label>
+          <input
+            id="nickName"
+            name="nickName"
+            type="text"
+            value={form.nickName}
+            onChange={onChange}
+            required
+          />
+        </div>
+
+        <div className={style.Field}>
+          <label htmlFor="firstName">First Name</label>
+          <input
+            id="firstName"
+            name="firstName"
+            type="text"
+            value={form.firstName}
+            onChange={onChange}
+            required
+          />
+        </div>
+
+        <div className={style.Field}>
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            id="lastName"
+            name="lastName"
+            type="text"
+            value={form.lastName}
+            onChange={onChange}
+            required
+          />
+        </div>
 
         <div className={style.Field}>
           <label htmlFor="email">Email</label>
@@ -231,8 +342,10 @@ export default function SignUpForm() {
               type="date"
               value={form.birthday}
               onChange={onChange}
+              required
             />
           </div>
+
           <div className={style.Field}>
             <label htmlFor="gender">Gender</label>
             <select
@@ -240,6 +353,7 @@ export default function SignUpForm() {
               name="gender"
               value={form.gender}
               onChange={onChange}
+              required
             >
               <option value="">Select…</option>
               <option value="male">Male</option>
@@ -256,6 +370,7 @@ export default function SignUpForm() {
             name="countryCode"
             value={form.countryCode}
             onChange={onChange}
+            required
           >
             <option value="">Select…</option>
             {countries.map((c) => (

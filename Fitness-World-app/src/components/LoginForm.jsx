@@ -1,5 +1,5 @@
 import { useState } from "react";
-import style from "../components/SignUpForm.module.css"; // reuse same styles
+import style from "../components/SignUpForm.module.css";
 import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
@@ -26,11 +26,9 @@ export default function LoginForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login failed");
 
-      // store token (simple approach)
       localStorage.setItem("token", data.token);
       setMsg({ type: "success", text: "Logged in!" });
 
-      // navigate to a protected page (adjust as you like)
       navigate("/");
     } catch (err) {
       setMsg({ type: "error", text: err.message });

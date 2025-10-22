@@ -1,17 +1,15 @@
-body {
-  background-color: #2c244e;
-}
-
 .Navbar {
   display: flex;
   align-items: center;
 }
 
 .Logo {
+  position: relative;
   height: 50px;
   width: auto;
   padding-left: 30px;
-  padding-top: 10px;
+  padding-bottom: 20px;
+  padding-top: 5px;
 }
 .HamburgerBtn {
   background: none;
@@ -30,14 +28,13 @@ body {
   display: flex;
   gap: 35px;
   padding-left: 50px;
-  padding-top: 20px;
 }
 
 .Home {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: #f3eaea;
+  color: #141829;
 }
 
 .Home:hover {
@@ -49,7 +46,7 @@ body {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: #f3eaea;
+  color: #141829;
 }
 
 .Plans:hover {
@@ -61,7 +58,7 @@ body {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: #f3eaea;
+  color: #141829;
 }
 
 .About:hover {
@@ -73,7 +70,7 @@ body {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: #f3eaea;
+  color: #141829;
 }
 
 .Blog:hover {
@@ -85,7 +82,7 @@ body {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   font-weight: lighter;
-  color: #f3eaea;
+  color: #141829;
 }
 
 .OurTeam:hover {
@@ -109,4 +106,28 @@ body {
 .LogoutBtn:hover {
   background: #f3bb24;
   color: #141829;
+}
+
+.Login {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: bolder;
+  color: #f3bb24;
+}
+
+.Login:hover {
+  color: #f3b124;
+  transform: scale(1.1);
+}
+
+.SignUp {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: bolder;
+  color: #f3bb24;
+}
+
+.SignUp:hover {
+  color: #f3b124;
+  transform: scale(1.1);
 }

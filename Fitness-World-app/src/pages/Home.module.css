@@ -1,13 +1,3 @@
-body {
-  background: linear-gradient(
-    to bottom,
-    #393061 17%,
-    #584893 73%,
-    #6474bd 100%
-  );
-  min-height: 100vh;
-}
-
 .BackgroundImg {
   position: absolute;
   top: 70px;
@@ -27,12 +17,13 @@ body {
   font-weight: lighter;
   color: #f3bb24;
   padding-left: 30px;
-  padding-top: 150px;
+  padding-top: 100px;
   z-index: 5;
 }
 
 .SubTittle {
-  position: relative;
+  position: absolute;
+  top: 370px;
   font-size: 17px;
   width: 700px;
   font-family: "Inter", sans-serif;

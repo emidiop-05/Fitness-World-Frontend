@@ -1,0 +1,102 @@
+.ProfileContainer {
+  max-width: 600px;
+  margin: 30px 0;
+  padding: 0 30px;
+  background-color: #ffffff;
+  border-radius: 16px;
+
+  font-family: "Inter", system-ui, sans-serif;
+  color: #222;
+}
+
+.BtnPic {
+  font-size: 5px;
+  position: absolute;
+  top: 250px;
+  left: 100px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 5px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.changePic {
+  height: 15px;
+}
+
+.Title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: left;
+  margin-bottom: 30px;
+  color: #1e293b;
+  position: relative;
+}
+
+.PerInfo {
+  font-size: 2rem;
+  font-weight: lighter;
+  text-align: left;
+  margin-bottom: 30px;
+  color: #1e293b;
+  position: relative;
+}
+
+.PerInfo::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 10px;
+  left: 370px;
+  width: 1060px;
+  height: 3px;
+  background: #1e293b;
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+.Title::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 10px;
+  left: 200px;
+  width: 1230px;
+  height: 3px;
+  background: #1e293b;
+  margin: 10px auto 0;
+  border-radius: 2px;
+}
+
+.InfoRow {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: left;
+  padding: 5px 0;
+  padding-right: 250px;
+}
+
+.Label {
+  font-weight: 600;
+  color: #374151;
+  flex: 1;
+}
+
+.Value {
+  text-align: left;
+  flex: 2;
+  color: #111827;
+  word-break: break-word;
+}
+
+.Footer {
+  margin-top: 24px;
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: left;
+}
