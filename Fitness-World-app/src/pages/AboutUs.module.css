@@ -1,0 +1,76 @@
+.AboutUs {
+  margin-left: 30px;
+}
+
+.Title {
+  font-size: 35px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: #141829;
+  width: 350px;
+}
+
+.SubTitle {
+  font-size: 25px;
+  font-family: "Inter", sans-serif;
+  font-weight: bolder;
+  color: #141829;
+  width: 600px;
+}
+
+.FirstPara {
+  font-size: 25px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: #141829;
+  width: 600px;
+}
+
+.SecondPara {
+  font-size: 25px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: #141829;
+  width: 600px;
+}
+
+.ThirdPara {
+  position: absolute;
+  right: 150px;
+  bottom: -250px;
+  font-size: 25px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: #141829;
+  width: 550px;
+}
+
+.LastMsg {
+  display: flex;
+  gap: 30px;
+  margin: 30px;
+  position: absolute;
+  bottom: -600px;
+  right: 300px;
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: bolder;
+  color: #141829;
+}
+
+.StockImg1 {
+  width: 700px;
+  position: absolute;
+  right: 30px;
+  top: 100px;
+  border-radius: 15px;
+  box-shadow: 5px 5px 20px rgb(33, 33, 33);
+}
+
+.StockImg2 {
+  position: absolute;
+  bottom: -500px;
+  width: 700px;
+  border-radius: 15px;
+  box-shadow: 5px 5px 20px rgb(33, 33, 33);
+}
