@@ -229,49 +229,6 @@ export default function SignUpForm() {
       <form onSubmit={onSubmit} className={style.Form}>
         <h2 className={style.Title}>Create account</h2>
 
-        {/* Profile image URL + preview */}
-        <div className={style.Field}>
-          <label htmlFor="profileImage">Profile Image URL (optional)</label>
-          <input
-            id="profileImage"
-            name="profileImage"
-            type="url"
-            placeholder="https://example.com/avatar.jpg"
-            value={form.profileImage}
-            onChange={(e) => {
-              setImgError(false);
-              onChange(e);
-            }}
-          />
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              marginTop: 10,
-            }}
-          >
-            <img
-              src={
-                imgError || !form.profileImage ? PLACEHOLDER : form.profileImage
-              }
-              alt="Preview"
-              onError={() => setImgError(true)}
-              style={{
-                width: 64,
-                height: 64,
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "1px solid #e5e7eb",
-              }}
-            />
-            <small style={{ color: "#6b7280" }}>
-              Paste an image URL. If empty or invalid, we’ll use a default
-              avatar.
-            </small>
-          </div>
-        </div>
-
         <div className={style.Field}>
           <label htmlFor="nickName">Nick Name</label>
           <input
