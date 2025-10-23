@@ -14,8 +14,8 @@ import Profile from "./pages/Profile";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import PrivateRoute from "./components/PrivateRoute";
-import Exercise from "./pages/Exercise"; // 👈 added
-
+import Exercise from "./pages/Exercise";
+import PostDetail from "./pages/PostDetail";
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen((v) => !v);
@@ -30,15 +30,14 @@ export default function App() {
         <Route path="/plans" element={<Plans />} />
         <Route path="/about" element={<About />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<PostDetail />} />
         <Route path="/OurTeam" element={<OurTeam />} />
-        {/* protected profile route */}
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
         </Route>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/exercise/:id" element={<Exercise />} />{" "}
-        {/* 👈 added route */}
       </Routes>
     </>
   );

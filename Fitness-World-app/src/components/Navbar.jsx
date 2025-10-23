@@ -9,7 +9,6 @@ function Navbar({ toggleSidebar }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // check on load
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
@@ -45,7 +44,6 @@ function Navbar({ toggleSidebar }) {
           <h1 className={styles.OurTeam}>Our Team</h1>
         </Link>
 
-        {/* 🔹 Login/Logout section */}
         {!isLoggedIn ? (
           <>
             <Link to="/login">
