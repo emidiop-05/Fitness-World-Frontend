@@ -51,7 +51,6 @@
   }
 }
 
-/* ====== Card ====== */
 .card {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
@@ -186,4 +185,26 @@
 }
 .skeletonLineShort {
   width: 55%;
+}
+.likeButton {
+  background: none;
+  border: none;
+  color: #111827;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+.likeButton:hover {
+  transform: scale(1.12);
+}
+.likeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.likeActive .heart {
+  filter: saturate(1.4);
 }

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-// If you're using the shared api() helper:
-//   import { api } from "../api/client";
-// Or if you made posts.js:
-//   import { getPosts } from "../api/posts";
+import NewPostModal from "../components/NewPostModal";
 import styles from "./Blog.module.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
@@ -14,43 +11,107 @@ export default function Blog() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
+  const [openNew, setOpenNew] = useState(false);
+  const [likingId, setLikingId] = useState(null);
+
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
 
   useEffect(() => {
     loadPosts(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   async function loadPosts(p) {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/api/posts?page=${p}&limit=10`);
+      const res = await fetch(`${API_BASE}/api/posts?page=${p}&limit=10`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
-      setPosts((prev) => (p === 1 ? data.posts : [...prev, ...data.posts]));
+      const withDefaults = data.posts.map((post) => ({
+        likedByMe: false,
+        ...post,
+      }));
+      setPosts((prev) => (p === 1 ? withDefaults : [...prev, ...withDefaults]));
       setTotal(data.total || 0);
       setErr("");
     } catch (e) {
-      setErr("Falha ao carregar posts.");
+      setErr("Error Loading Posts");
       console.error(e);
     } finally {
       setLoading(false);
     }
   }
 
+  async function handleLike(e, postId) {
+    e.preventDefault();
+    if (!token) {
+      alert("You must be logged in to like posts.");
+      return;
+    }
+    try {
+      setLikingId(postId);
+      setPosts((prev) =>
+        prev.map((p) =>
+          p._id === postId
+            ? {
+                ...p,
+                likedByMe: !p.likedByMe,
+                likesCount: (p.likesCount ?? 0) + (p.likedByMe ? -1 : 1),
+              }
+            : p
+        )
+      );
+
+      const res = await fetch(`${API_BASE}/api/posts/${postId}/like`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const { liked, likesCount } = await res.json();
+
+      setPosts((prev) =>
+        prev.map((p) =>
+          p._id === postId ? { ...p, likedByMe: liked, likesCount } : p
+        )
+      );
+    } catch (err) {
+      console.error("Error liking post:", err);
+      loadPosts(page);
+    } finally {
+      setLikingId(null);
+    }
+  }
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Blog</h1>
-        <p className={styles.subtitle}>Últimos artigos da comunidade</p>
+        <div>
+          <h1 className={styles.title}>Blog</h1>
+          <p className={styles.subtitle}>Last Posts:</p>
+        </div>
+
+        {isLoggedIn && (
+          <button
+            type="button"
+            className={styles.loadMore}
+            onClick={() => setOpenNew(true)}
+          >
+            Create Post
+          </button>
+        )}
       </header>
 
       {!!err && <div className={styles.error}>{err}</div>}
 
-      {/* Empty state */}
       {!loading && posts.length === 0 && !err && (
         <div className={styles.empty}>
-          <h3>Ainda não há posts</h3>
-          <p>Crie o primeiro post para começar a conversa.</p>
+          <h3>There are no posts yet</h3>
+          <p>Create the first post of the conversation.</p>
         </div>
       )}
 
@@ -77,7 +138,7 @@ export default function Blog() {
                         post.author?.profileImage ||
                         "https://via.placeholder.com/48"
                       }
-                      alt={post.author?.nickName || "Autor"}
+                      alt={post.author?.nickName || "Author"}
                       loading="lazy"
                     />
                     <span className={styles.authorName}>
@@ -85,7 +146,7 @@ export default function Blog() {
                         `${post.author?.firstName || ""} ${
                           post.author?.lastName || ""
                         }`.trim() ||
-                        "Autor"}
+                        "Author"}
                     </span>
                   </div>
                   <time className={styles.date}>
@@ -106,7 +167,19 @@ export default function Blog() {
                 )}
 
                 <div className={styles.stats}>
-                  <span>❤️ {post.likesCount ?? 0}</span>
+                  <button
+                    onClick={(e) => handleLike(e, post._id)}
+                    className={`${styles.likeButton} ${
+                      post.likedByMe ? styles.likeActive : ""
+                    }`}
+                    disabled={likingId === post._id}
+                    aria-pressed={post.likedByMe}
+                    aria-label={post.likedByMe ? "Unlike" : "Like"}
+                    title={post.likedByMe ? "Unlike" : "Like"}
+                  >
+                    <span className={styles.heart}>❤️</span>{" "}
+                    {post.likesCount ?? 0}
+                  </button>
                   <span>💬 {post.commentsCount ?? 0}</span>
                 </div>
               </article>
@@ -120,10 +193,12 @@ export default function Blog() {
             onClick={() => setPage((p) => p + 1)}
             disabled={loading}
           >
-            {loading ? "Carregando..." : "Carregar mais"}
+            {loading ? "loading..." : "Load More"}
           </button>
         </div>
       )}
+
+      <NewPostModal open={openNew} onClose={() => setOpenNew(false)} />
     </div>
   );
 }
