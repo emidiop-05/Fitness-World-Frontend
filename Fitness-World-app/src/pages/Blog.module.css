@@ -208,3 +208,18 @@
 .likeActive .heart {
   filter: saturate(1.4);
 }
+.deleteBtn {
+  background-color: #e53935;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background-color: #c62828;
+  transform: scale(1.05);
+}

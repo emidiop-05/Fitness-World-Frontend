@@ -1,10 +1,10 @@
-console.log("API_BASE:", import.meta.env.VITE_API_BASE);
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import NewPostModal from "../components/NewPostModal";
 import styles from "./Blog.module.css";
+const PLACEHOLDER = "../assets/placeholderPf.svg";
 
+console.log("API_BASE:", import.meta.env.VITE_API_BASE);
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
 
 export default function Blog() {
@@ -18,6 +18,8 @@ export default function Blog() {
 
   const token = localStorage.getItem("token");
   const isLoggedIn = !!token;
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const currentUserId = currentUser?._id;
 
   useEffect(() => {
     loadPosts(page);
@@ -69,7 +71,7 @@ export default function Blog() {
         )
       );
 
-      const res = await fetch(`${API_BASE}/api/posts/${postId}/like`, {
+      const res = await fetch(`${API_BASE}/posts/${postId}/like`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -86,6 +88,26 @@ export default function Blog() {
       loadPosts(page);
     } finally {
       setLikingId(null);
+    }
+  }
+
+  async function handleDelete(postId) {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/posts/${postId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.status === 204) {
+        setPosts((prev) => prev.filter((p) => p._id !== postId));
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to delete post");
+      }
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Something went wrong deleting the post.");
     }
   }
 
@@ -136,12 +158,16 @@ export default function Blog() {
                   <div className={styles.author}>
                     <img
                       className={styles.avatar}
-                      src={
-                        post.author?.profileImage ||
-                        "https://via.placeholder.com/48"
-                      }
+                      src={post.author?.profileImage || PLACEHOLDER}
                       alt={post.author?.nickName || "Author"}
+                      width={48}
+                      height={48}
                       loading="lazy"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = PLACEHOLDER;
+                      }}
                     />
                     <span className={styles.authorName}>
                       {post.author?.nickName ||
@@ -182,8 +208,18 @@ export default function Blog() {
                     <span className={styles.heart}>❤️</span>{" "}
                     {post.likesCount ?? 0}
                   </button>
+
                   <span>💬 {post.commentsCount ?? 0}</span>
                 </div>
+
+                {isLoggedIn && post.author?._id === currentUserId && (
+                  <button
+                    onClick={() => handleDelete(post._id)}
+                    className={styles.deleteBtn}
+                  >
+                    🗑️ Delete
+                  </button>
+                )}
               </article>
             ))}
       </section>
