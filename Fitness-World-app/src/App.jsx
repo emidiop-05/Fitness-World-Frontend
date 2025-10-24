@@ -1,6 +1,5 @@
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import SignUpForm from "./components/SignUpForm";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import { useState } from "react";

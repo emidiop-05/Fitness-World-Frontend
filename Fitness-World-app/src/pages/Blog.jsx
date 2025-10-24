@@ -1,3 +1,5 @@
+console.log("API_BASE:", import.meta.env.VITE_API_BASE);
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import NewPostModal from "../components/NewPostModal";
