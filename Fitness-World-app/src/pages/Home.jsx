@@ -1,5 +1,5 @@
 import style from "../pages/Home.module.css";
-import BackgroundImg from "../assets/backgroundImg.png";
+import BackgroundImg from "../assets/BackgroundImg.png";
 import { Link } from "react-router-dom";
 
 export default function Home() {
