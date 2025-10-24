@@ -1,0 +1,48 @@
+.AboutUs {
+  margin-left: 30px;
+}
+
+.Title {
+  font-size: 35px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: #141829;
+  width: 480px;
+}
+
+.SubTitle {
+  font-size: 20px;
+  font-family: "Inter", sans-serif;
+  font-weight: italic;
+  color: #06080d;
+  width: 600px;
+}
+
+.FirstPara {
+  font-size: 25px;
+  font-family: "Inter", sans-serif;
+  font-weight: lighter;
+  color: #141829;
+  width: 600px;
+}
+
+.StockImg3 {
+  width: 750px;
+  position: absolute;
+  top: 20%;
+  right: 2%;
+  border-radius: 15px;
+}
+
+.LastMsg {
+  display: flex;
+  gap: 30px;
+  margin: 30px;
+  position: absolute;
+  bottom: -600px;
+  right: 300px;
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: bolder;
+  color: #141829;
+}

@@ -1,7 +1,6 @@
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import { Routes, Route } from "react-router-dom";
-import "./App.css";
 import { useState } from "react";
 
 import Home from "./pages/Home";
