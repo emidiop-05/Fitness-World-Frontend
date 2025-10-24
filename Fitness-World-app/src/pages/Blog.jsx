@@ -71,7 +71,7 @@ export default function Blog() {
         )
       );
 
-      const res = await fetch(`${API_BASE}/posts/${postId}/like`, {
+      const res = await fetch(`${API_BASE}/api/posts/${postId}/like`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -94,7 +94,7 @@ export default function Blog() {
   async function handleDelete(postId) {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
     try {
-      const res = await fetch(`${API_BASE}/posts/${postId}`, {
+      const res = await fetch(`${API_BASE}/api/posts/${postId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
