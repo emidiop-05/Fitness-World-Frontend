@@ -27,6 +27,8 @@ export default function LoginForm() {
       if (!res.ok) throw new Error(data.error || "Login failed");
 
       localStorage.setItem("token", data.token);
+      window.dispatchEvent(new Event("auth"));
+
       setMsg({ type: "success", text: "Logged in!" });
 
       navigate("/");

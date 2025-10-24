@@ -2,7 +2,7 @@ import { useState } from "react";
 import style from "../components/SignUpForm.module.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
-const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/847/847969.png"; // matches your default style
+const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
 export default function SignUpForm() {
   const [form, setForm] = useState({
@@ -14,7 +14,7 @@ export default function SignUpForm() {
     birthday: "",
     gender: "",
     countryCode: "",
-    profileImage: "", // NEW
+    profileImage: "",
   });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState(null);
@@ -177,7 +177,6 @@ export default function SignUpForm() {
     setLoading(true);
     setMsg(null);
     try {
-      // 1) Create user (send profileImage too)
       const res = await fetch(`${API_BASE}/api/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -186,7 +185,6 @@ export default function SignUpForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Sign up failed");
 
-      // 2) Auto-login
       const loginRes = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -196,6 +194,7 @@ export default function SignUpForm() {
       if (!loginRes.ok) throw new Error(loginData.error || "Auto-login failed");
 
       localStorage.setItem("token", loginData.token);
+      window.dispatchEvent(new Event("auth"));
 
       setMsg({
         type: "success",

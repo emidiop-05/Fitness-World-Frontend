@@ -9,12 +9,27 @@ function Navbar({ toggleSidebar }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+    };
+
+    checkAuth();
+
+    window.addEventListener("auth", checkAuth);
+
+    window.addEventListener("storage", checkAuth);
+
+    return () => {
+      window.removeEventListener("auth", checkAuth);
+      window.removeEventListener("storage", checkAuth);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+
+    window.dispatchEvent(new Event("auth"));
     setIsLoggedIn(false);
     navigate("/login");
   };
