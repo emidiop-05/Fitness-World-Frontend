@@ -11,6 +11,10 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadErr, setUploadErr] = useState(null);
+
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [avatarVersion, setAvatarVersion] = useState(0);
+
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -45,6 +49,11 @@ export default function Profile() {
         setLoading(false);
       }
     })();
+
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChooseFile = () => fileInputRef.current?.click();
@@ -69,6 +78,10 @@ export default function Profile() {
       return;
     }
 
+    // Optimistic preview
+    const localPreview = URL.createObjectURL(file);
+    setPreviewUrl(localPreview);
+
     const formData = new FormData();
     formData.append("avatar", file);
 
@@ -76,40 +89,59 @@ export default function Profile() {
       setUploading(true);
       const res = await fetch(`${API_BASE}/api/uploads/avatar`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` }, // NOTE: no Content-Type
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
-      // Update UI with new image URL
+      // Preserve existing me fields, only replace the image
       setMe((prev) => ({ ...(prev || {}), profileImage: data.url }));
+      setAvatarVersion((v) => v + 1);
     } catch (e) {
       setUploadErr(e.message);
+      setPreviewUrl(null);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      setTimeout(() => {
+        if (localPreview) URL.revokeObjectURL(localPreview);
+      }, 500);
     }
+  };
+
+  const withCacheBuster = (url, version) => {
+    if (!url) return url;
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}v=${version}`;
   };
 
   if (loading) return <div style={{ padding: 24 }}>Loading profile…</div>;
   if (err) return <div style={{ padding: 24 }}>Error: {err}</div>;
   if (!me) return null;
 
+  const avatarSrc =
+    previewUrl ||
+    withCacheBuster(me.profileImage, avatarVersion) ||
+    PLACEHOLDER;
+
   return (
     <div className={style.ProfileContainer}>
       <h1 className={style.Title}>My Profile</h1>
 
+      {/* Make this relative so the absolute .BtnPic is contained */}
       <div
         style={{
+          position: "relative",
           display: "flex",
           alignItems: "center",
           gap: 16,
           marginBottom: 24,
+          minHeight: 120, // gives room for the absolute button if needed
         }}
       >
         <img
-          src={me.profileImage || PLACEHOLDER}
+          src={avatarSrc}
           alt={`${me.firstName || "User"} profile`}
           onError={(e) => {
             e.currentTarget.onerror = null;
@@ -125,39 +157,44 @@ export default function Profile() {
           }}
         />
 
-        <div>
-          <button
-            className={style.BtnPic}
-            type="button"
-            onClick={handleChooseFile}
-            disabled={uploading}
-          >
+        {/* Keep your absolute-styled button but inside this relative container */}
+        <button
+          className={style.BtnPic}
+          type="button"
+          onClick={handleChooseFile}
+          disabled={uploading}
+          aria-busy={uploading}
+        >
+          {uploading ? (
+            <span className={style.uploadingText}>Uploading…</span>
+          ) : (
             <img
               className={style.changePic}
-              src={uploading ? img : changePic}
+              src={changePic}
               alt="Change profile"
             />
-          </button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            style={{ display: "none" }}
-          />
-
-          {uploadErr && (
-            <div style={{ marginTop: 8, color: "#b91c1c", fontSize: 13 }}>
-              {uploadErr}
-            </div>
           )}
-        </div>
+        </button>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
+
+        {uploadErr && (
+          <div style={{ marginTop: 8, color: "#b91c1c", fontSize: 13 }}>
+            {uploadErr}
+          </div>
+        )}
       </div>
 
+      {/* Your info rows — actually render them */}
       <div className={style.InfoRow}>
         <span className={style.Label}>Nick:</span>
-        <span className={style.Value}>{me.nickName}</span>
+        <span className={style.Value}>{me.nickName || "-"}</span>
       </div>
 
       <div className={style.InfoRow}>
@@ -169,17 +206,17 @@ export default function Profile() {
 
       <div className={style.InfoRow}>
         <span className={style.Label}>First Name:</span>
-        <span className={style.Value}>{me.firstName}</span>
+        <span className={style.Value}>{me.firstName || "-"}</span>
       </div>
 
       <div className={style.InfoRow}>
         <span className={style.Label}>Last Name:</span>
-        <span className={style.Value}>{me.lastName}</span>
+        <span className={style.Value}>{me.lastName || "-"}</span>
       </div>
 
       <div className={style.InfoRow}>
         <span className={style.Label}>Email:</span>
-        <span className={style.Value}>{me.email}</span>
+        <span className={style.Value}>{me.email || "-"}</span>
       </div>
 
       <div className={style.InfoRow}>
