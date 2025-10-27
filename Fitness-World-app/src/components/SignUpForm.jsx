@@ -203,7 +203,6 @@ export default function SignUpForm() {
         }!`,
       });
 
-      // Reset
       setForm({
         firstName: "",
         lastName: "",

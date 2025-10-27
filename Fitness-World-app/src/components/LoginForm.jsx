@@ -31,12 +31,10 @@ export default function LoginForm() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      // Optional: dispatch a custom event so navbar/profile, etc., can react to login
       window.dispatchEvent(new Event("auth"));
 
       setMsg({ type: "success", text: "Logged in!" });
 
-      // Redirect after successful login
       navigate("/");
     } catch (err) {
       setMsg({ type: "error", text: err.message });

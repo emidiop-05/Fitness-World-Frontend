@@ -53,7 +53,6 @@ export default function Profile() {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChooseFile = () => fileInputRef.current?.click();
@@ -78,7 +77,6 @@ export default function Profile() {
       return;
     }
 
-    // Optimistic preview
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
 
@@ -95,7 +93,6 @@ export default function Profile() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
 
-      // Preserve existing me fields, only replace the image
       setMe((prev) => ({ ...(prev || {}), profileImage: data.url }));
       setAvatarVersion((v) => v + 1);
     } catch (e) {
@@ -129,7 +126,6 @@ export default function Profile() {
     <div className={style.ProfileContainer}>
       <h1 className={style.Title}>My Profile</h1>
 
-      {/* Make this relative so the absolute .BtnPic is contained */}
       <div
         style={{
           position: "relative",
@@ -137,7 +133,7 @@ export default function Profile() {
           alignItems: "center",
           gap: 16,
           marginBottom: 24,
-          minHeight: 120, // gives room for the absolute button if needed
+          minHeight: 120,
         }}
       >
         <img
@@ -157,7 +153,6 @@ export default function Profile() {
           }}
         />
 
-        {/* Keep your absolute-styled button but inside this relative container */}
         <button
           className={style.BtnPic}
           type="button"
@@ -191,7 +186,6 @@ export default function Profile() {
         )}
       </div>
 
-      {/* Your info rows — actually render them */}
       <div className={style.InfoRow}>
         <span className={style.Label}>Nick:</span>
         <span className={style.Value}>{me.nickName || "-"}</span>

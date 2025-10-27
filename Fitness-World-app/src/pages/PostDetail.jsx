@@ -165,7 +165,6 @@ export default function PostDetail() {
     );
   }
 
-  // prefer server-provided, fallback to local compare
   const currentUserId = auth.user?._id || null;
   const authorId =
     post.author && typeof post.author === "object"
