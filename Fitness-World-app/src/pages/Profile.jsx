@@ -3,7 +3,7 @@ import style from "../pages/Profile.module.css";
 import changePic from "../assets/change-2.png";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
-const PLACEHOLDER = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+const PLACEHOLDER = "https://placehold.co/96x96/png";
 
 export default function Profile() {
   const [me, setMe] = useState(null);

@@ -4,7 +4,7 @@ import NewPostModal from "../components/NewPostModal";
 import styles from "./Blog.module.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
-const AVATAR_PLACEHOLDER = "https://via.placeholder.com/48";
+const AVATAR_PLACEHOLDER = "https://placehold.co/48x48/png";
 
 export default function Blog() {
   const [posts, setPosts] = useState([]);
