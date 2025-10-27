@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import styles from "./PostDetail.module.css";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
+const AVATAR_PLACEHOLDER = "https://via.placeholder.com/48";
 
 export default function PostDetail() {
   const { slug } = useParams();
+  const navigate = useNavigate();
+
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +16,21 @@ export default function PostDetail() {
   const [newComment, setNewComment] = useState("");
   const [error, setError] = useState("");
   const [liking, setLiking] = useState(false);
-  const token = localStorage.getItem("token");
+
+  const [auth, setAuth] = useState(() => ({
+    token: localStorage.getItem("token"),
+    user: safeParse(localStorage.getItem("user")),
+  }));
+
+  useEffect(() => {
+    const onAuth = () =>
+      setAuth({
+        token: localStorage.getItem("token"),
+        user: safeParse(localStorage.getItem("user")),
+      });
+    window.addEventListener("auth", onAuth);
+    return () => window.removeEventListener("auth", onAuth);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -22,12 +39,12 @@ export default function PostDetail() {
         const pRes = await fetch(`${API_BASE}/api/posts/${slug}`, {
           headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(auth.token ? { Authorization: `Bearer ${auth.token}` } : {}),
           },
         });
         if (!pRes.ok) throw new Error(await pRes.text());
         const pData = await pRes.json();
-        setPost({ likedByMe: false, ...pData });
+        setPost({ likedByMe: false, canDelete: false, ...pData });
 
         const cRes = await fetch(`${API_BASE}/api/comments/${pData._id}`);
         if (!cRes.ok) throw new Error(await cRes.text());
@@ -40,10 +57,10 @@ export default function PostDetail() {
         setLoading(false);
       }
     })();
-  }, [slug, token]);
+  }, [slug, auth.token]);
 
   async function handleLike() {
-    if (!token) {
+    if (!auth.token) {
       alert("Its mandatory to have an account to like the post.");
       return;
     }
@@ -60,7 +77,7 @@ export default function PostDetail() {
       );
       const res = await fetch(`${API_BASE}/api/posts/${post._id}/like`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${auth.token}` },
       });
       if (!res.ok) throw new Error(await res.text());
       const { liked, likesCount } = await res.json();
@@ -78,7 +95,7 @@ export default function PostDetail() {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!newComment.trim()) return;
-    if (!token) {
+    if (!auth.token) {
       setError("Its mandatory to have an account to comment.");
       return;
     }
@@ -88,7 +105,7 @@ export default function PostDetail() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${auth.token}`,
         },
         body: JSON.stringify({ body: newComment.trim() }),
       });
@@ -102,6 +119,27 @@ export default function PostDetail() {
       setError("Was not possible to send the comment.");
     } finally {
       setSending(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!auth.token) return alert("You must be logged in.");
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/posts/${post._id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${auth.token}` },
+      });
+      if (res.status === 204) {
+        navigate("/blog");
+        return;
+      }
+      const data = await res.json();
+      alert(data.error || "Failed to delete post");
+    } catch (e) {
+      console.error(e);
+      alert("Something went wrong deleting the post.");
     }
   }
 
@@ -127,6 +165,16 @@ export default function PostDetail() {
     );
   }
 
+  // prefer server-provided, fallback to local compare
+  const currentUserId = auth.user?._id || null;
+  const authorId =
+    post.author && typeof post.author === "object"
+      ? post.author._id
+      : post.author;
+  const fallbackCanDelete =
+    currentUserId && String(authorId) === String(currentUserId);
+  const canDelete = post.canDelete ?? fallbackCanDelete;
+
   return (
     <div className={styles.container}>
       <nav className={styles.breadcrumb}>
@@ -144,10 +192,8 @@ export default function PostDetail() {
           <div className={styles.authorBox}>
             <img
               className={styles.avatar}
-              src={
-                post.author?.profileImage || "https://via.placeholder.com/48"
-              }
-              alt={post.author?.nickName || "Autor"}
+              src={post.author?.profileImage || AVATAR_PLACEHOLDER}
+              alt={post.author?.nickName || "Author"}
             />
             <div className={styles.authorInfo}>
               <span className={styles.authorName}>
@@ -155,7 +201,7 @@ export default function PostDetail() {
                   `${post.author?.firstName || ""} ${
                     post.author?.lastName || ""
                   }`.trim() ||
-                  "Autor"}
+                  "Author"}
               </span>
               <time className={styles.date}>
                 {new Date(post.createdAt).toLocaleDateString()}
@@ -192,6 +238,12 @@ export default function PostDetail() {
               </li>
             ))}
           </ul>
+        )}
+
+        {canDelete && (
+          <button className={styles.deleteBtn} onClick={handleDelete}>
+            🗑️ Delete
+          </button>
         )}
       </article>
 
@@ -246,4 +298,12 @@ export default function PostDetail() {
       </section>
     </div>
   );
+}
+
+function safeParse(json) {
+  try {
+    return json ? JSON.parse(json) : null;
+  } catch {
+    return null;
+  }
 }

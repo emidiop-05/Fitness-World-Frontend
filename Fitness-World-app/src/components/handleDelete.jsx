@@ -1,9 +1,8 @@
-async function handleDelete(postId) {
+export default async function handleDelete(API_BASE, token, postId, setPosts) {
   if (!window.confirm("Are you sure you want to delete this post?")) return;
 
   try {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${API_BASE}/posts/${postId}`, {
+    const res = await fetch(`${API_BASE}/api/posts/${postId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });

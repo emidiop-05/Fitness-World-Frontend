@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import NewPostModal from "../components/NewPostModal";
 import styles from "./Blog.module.css";
-const PLACEHOLDER = "../assets/placeholderPf.svg";
 
-console.log("API_BASE:", import.meta.env.VITE_API_BASE);
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
+const AVATAR_PLACEHOLDER = "https://via.placeholder.com/48";
 
 export default function Blog() {
   const [posts, setPosts] = useState([]);
@@ -16,14 +15,24 @@ export default function Blog() {
   const [openNew, setOpenNew] = useState(false);
   const [likingId, setLikingId] = useState(null);
 
-  const token = localStorage.getItem("token");
-  const isLoggedIn = !!token;
-  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-  const currentUserId = currentUser?._id;
+  const [auth, setAuth] = useState(() => ({
+    token: localStorage.getItem("token"),
+    user: safeParse(localStorage.getItem("user")),
+  }));
+
+  useEffect(() => {
+    const onAuth = () =>
+      setAuth({
+        token: localStorage.getItem("token"),
+        user: safeParse(localStorage.getItem("user")),
+      });
+    window.addEventListener("auth", onAuth);
+    return () => window.removeEventListener("auth", onAuth);
+  }, []);
 
   useEffect(() => {
     loadPosts(page);
-  }, [page]);
+  }, [page, auth.token]);
 
   async function loadPosts(p) {
     try {
@@ -31,21 +40,25 @@ export default function Blog() {
       const res = await fetch(`${API_BASE}/api/posts?page=${p}&limit=10`, {
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(auth.token ? { Authorization: `Bearer ${auth.token}` } : {}),
         },
+        credentials: "include",
       });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
-      const withDefaults = data.posts.map((post) => ({
+
+      const withDefaults = (data.posts || []).map((post) => ({
         likedByMe: false,
+        canDelete: false,
         ...post,
       }));
+
       setPosts((prev) => (p === 1 ? withDefaults : [...prev, ...withDefaults]));
       setTotal(data.total || 0);
       setErr("");
     } catch (e) {
+      console.error("Error loading posts:", e);
       setErr("Error Loading Posts");
-      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -53,7 +66,7 @@ export default function Blog() {
 
   async function handleLike(e, postId) {
     e.preventDefault();
-    if (!token) {
+    if (!auth.token) {
       alert("You must be logged in to like posts.");
       return;
     }
@@ -73,7 +86,7 @@ export default function Blog() {
 
       const res = await fetch(`${API_BASE}/api/posts/${postId}/like`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${auth.token}` },
       });
       if (!res.ok) throw new Error(await res.text());
       const { liked, likesCount } = await res.json();
@@ -96,11 +109,12 @@ export default function Blog() {
     try {
       const res = await fetch(`${API_BASE}/api/posts/${postId}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${auth.token}` },
       });
 
       if (res.status === 204) {
         setPosts((prev) => prev.filter((p) => p._id !== postId));
+        setTotal((t) => Math.max(0, t - 1));
       } else {
         const data = await res.json();
         alert(data.error || "Failed to delete post");
@@ -111,6 +125,8 @@ export default function Blog() {
     }
   }
 
+  const currentUserId = auth.user?._id || null;
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -119,7 +135,7 @@ export default function Blog() {
           <p className={styles.subtitle}>Last Posts:</p>
         </div>
 
-        {isLoggedIn && (
+        {auth.token && (
           <button
             type="button"
             className={styles.loadMore}
@@ -148,80 +164,91 @@ export default function Blog() {
                 <div className={styles.skeletonLineShort} />
               </article>
             ))
-          : posts.map((post) => (
-              <article key={post._id} className={styles.card}>
-                <Link className={styles.cardLink} to={`/blog/${post.slug}`}>
-                  <h2 className={styles.cardTitle}>{post.title}</h2>
-                </Link>
+          : posts.map((post) => {
+              const authorId =
+                post.author && typeof post.author === "object"
+                  ? post.author._id
+                  : post.author;
 
-                <div className={styles.meta}>
-                  <div className={styles.author}>
-                    <img
-                      className={styles.avatar}
-                      src={post.author?.profileImage || PLACEHOLDER}
-                      alt={post.author?.nickName || "Author"}
-                      width={48}
-                      height={48}
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = PLACEHOLDER;
-                      }}
-                    />
-                    <span className={styles.authorName}>
-                      {post.author?.nickName ||
-                        `${post.author?.firstName || ""} ${
-                          post.author?.lastName || ""
-                        }`.trim() ||
-                        "Author"}
-                    </span>
+              const canDelete =
+                post.canDelete === true ||
+                (currentUserId && String(authorId) === String(currentUserId));
+
+              return (
+                <article key={post._id} className={styles.card}>
+                  <Link className={styles.cardLink} to={`/blog/${post.slug}`}>
+                    <h2 className={styles.cardTitle}>{post.title}</h2>
+                  </Link>
+
+                  <div className={styles.meta}>
+                    <div className={styles.author}>
+                      <img
+                        className={styles.avatar}
+                        src={post.author?.profileImage || AVATAR_PLACEHOLDER}
+                        alt={post.author?.nickName || "Author"}
+                        width={48}
+                        height={48}
+                        loading="lazy"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = AVATAR_PLACEHOLDER;
+                        }}
+                      />
+                      <span className={styles.authorName}>
+                        {post.author?.nickName ||
+                          `${post.author?.firstName || ""} ${
+                            post.author?.lastName || ""
+                          }`.trim() ||
+                          "Author"}
+                      </span>
+                    </div>
+                    <time className={styles.date}>
+                      {new Date(post.createdAt).toLocaleDateString()}
+                    </time>
                   </div>
-                  <time className={styles.date}>
-                    {new Date(post.createdAt).toLocaleDateString()}
-                  </time>
-                </div>
 
-                <p className={styles.excerpt}>{post.body}</p>
+                  <p className={styles.excerpt}>{post.body}</p>
 
-                {post.tags?.length > 0 && (
-                  <ul className={styles.tags}>
-                    {post.tags.slice(0, 4).map((t) => (
-                      <li key={t} className={styles.tag}>
-                        #{t}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                  {post.tags?.length > 0 && (
+                    <ul className={styles.tags}>
+                      {post.tags.slice(0, 4).map((t) => (
+                        <li key={t} className={styles.tag}>
+                          #{t}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
 
-                <div className={styles.stats}>
-                  <button
-                    onClick={(e) => handleLike(e, post._id)}
-                    className={`${styles.likeButton} ${
-                      post.likedByMe ? styles.likeActive : ""
-                    }`}
-                    disabled={likingId === post._id}
-                    aria-pressed={post.likedByMe}
-                    aria-label={post.likedByMe ? "Unlike" : "Like"}
-                    title={post.likedByMe ? "Unlike" : "Like"}
-                  >
-                    <span className={styles.heart}>❤️</span>{" "}
-                    {post.likesCount ?? 0}
-                  </button>
+                  <div className={styles.stats}>
+                    <button
+                      onClick={(e) => handleLike(e, post._id)}
+                      className={`${styles.likeButton} ${
+                        post.likedByMe ? styles.likeActive : ""
+                      }`}
+                      disabled={likingId === post._id}
+                      aria-pressed={post.likedByMe}
+                      aria-label={post.likedByMe ? "Unlike" : "Like"}
+                      title={post.likedByMe ? "Unlike" : "Like"}
+                    >
+                      <span className={styles.heart}>❤️</span>{" "}
+                      {post.likesCount ?? 0}
+                    </button>
 
-                  <span>💬 {post.commentsCount ?? 0}</span>
-                </div>
+                    <span>💬 {post.commentsCount ?? 0}</span>
+                  </div>
 
-                {isLoggedIn && post.author?._id === currentUserId && (
-                  <button
-                    onClick={() => handleDelete(post._id)}
-                    className={styles.deleteBtn}
-                  >
-                    🗑️ Delete
-                  </button>
-                )}
-              </article>
-            ))}
+                  {canDelete && (
+                    <button
+                      onClick={() => handleDelete(post._id)}
+                      className={styles.deleteBtn}
+                    >
+                      🗑️ Delete
+                    </button>
+                  )}
+                </article>
+              );
+            })}
       </section>
 
       {posts.length < total && (
@@ -239,4 +266,12 @@ export default function Blog() {
       <NewPostModal open={openNew} onClose={() => setOpenNew(false)} />
     </div>
   );
+}
+
+function safeParse(json) {
+  try {
+    return json ? JSON.parse(json) : null;
+  } catch {
+    return null;
+  }
 }

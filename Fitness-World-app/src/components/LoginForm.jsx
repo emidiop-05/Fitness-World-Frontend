@@ -17,20 +17,26 @@ export default function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setMsg(null);
+
     try {
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login failed");
 
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Optional: dispatch a custom event so navbar/profile, etc., can react to login
       window.dispatchEvent(new Event("auth"));
 
       setMsg({ type: "success", text: "Logged in!" });
 
+      // Redirect after successful login
       navigate("/");
     } catch (err) {
       setMsg({ type: "error", text: err.message });
