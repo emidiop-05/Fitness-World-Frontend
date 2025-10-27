@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import Exercise from "./pages/Exercise";
 import PostDetail from "./pages/PostDetail";
+import ChatWidget from "./components/ChatWidget";
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen((v) => !v);
@@ -22,6 +23,11 @@ export default function App() {
     <>
       <Navbar toggleSidebar={toggleSidebar} />
       <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
+      <ChatWidget
+        title="Fitness World Assistant"
+        pageContext="User browsing the blog page"
+        collapsedByDefault={true}
+      />
 
       <Routes>
         <Route path="/" element={<Home />} />
