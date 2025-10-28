@@ -11,10 +11,12 @@ import OurTeam from "./pages/OurTeam";
 import Profile from "./pages/Profile";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
+import BMICalc from "./pages/BmiCalc";
 import PrivateRoute from "./components/PrivateRoute";
 import Exercise from "./pages/Exercise";
 import PostDetail from "./pages/PostDetail";
 import ChatWidget from "./components/ChatWidget";
+
 export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen((v) => !v);
@@ -42,6 +44,7 @@ export default function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/exercise/:id" element={<Exercise />} />{" "}
+        <Route path="/BMICalc" element={<BMICalc />} />
       </Routes>
     </>
   );

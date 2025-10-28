@@ -98,3 +98,14 @@
 .OurTeam:hover {
   color: #354478;
 }
+
+.BMICalc {
+  font-size: 20px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: #141829;
+}
+
+.BMICalc:hover {
+  color: #354478;
+}

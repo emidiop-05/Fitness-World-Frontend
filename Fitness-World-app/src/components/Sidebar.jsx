@@ -27,17 +27,20 @@ export default function Sidebar({ isOpen, onClose }) {
           <NavLink to="/profile" onClick={onClose}>
             <p className={styles.Profile}>Profile</p>
           </NavLink>
-          <NavLink to="/plans" onClick={onClose}>
-            <p className={styles.Plans}>Plans</p>
-          </NavLink>
-          <NavLink to="/about" onClick={onClose}>
-            <p className={styles.About}>About</p>
-          </NavLink>
           <NavLink to="/blog" onClick={onClose}>
             <p className={styles.Blog}>Blog</p>
           </NavLink>
+          <NavLink to="/plans" onClick={onClose}>
+            <p className={styles.Plans}>Plans</p>
+          </NavLink>
+          <NavLink to="/BMICalc" onClick={onClose}>
+            <p className={styles.BMICalc}>BMI Calculator</p>
+          </NavLink>
           <NavLink to="/OurTeam" onClick={onClose}>
             <p className={styles.OurTeam}>Our Team</p>
+          </NavLink>
+          <NavLink to="/about" onClick={onClose}>
+            <p className={styles.About}>About</p>
           </NavLink>
         </nav>
       </aside>

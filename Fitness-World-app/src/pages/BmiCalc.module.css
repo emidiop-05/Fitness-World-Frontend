@@ -1,0 +1,30 @@
+.Container {
+  padding: 30px;
+  min-width: 100px;
+}
+
+.Title {
+  font-size: 35px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: #141829;
+}
+
+.DataContainer {
+  display: flex;
+  gap: 20px;
+}
+
+.Data {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: #141829;
+}
+
+.Result {
+  font-size: 15px;
+  font-family: "Inter", sans-serif;
+  font-weight: bold;
+  color: #141829;
+}
