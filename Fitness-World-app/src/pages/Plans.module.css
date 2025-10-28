@@ -119,3 +119,76 @@
   font-size: 0.9rem;
   color: #6b7280;
 }
+
+.SelectRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.Select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.Btn {
+  background: #f4cb26;
+  border: none;
+  color: #000;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.Btn:hover {
+  background: #e8b91f;
+}
+
+.Error {
+  color: #b91c1c;
+  margin-top: 10px;
+}
+
+.PlanSection {
+  margin-top: 30px;
+}
+
+.DayCard {
+  background: #ffe53b;
+  border: 1px solid #f9ee1a;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.DayTitle {
+  margin: 0 0 8px;
+  color: #141829;
+}
+
+.ExerciseList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ExerciseItem {
+  margin: 6px 0;
+}
+
+.ExLink {
+  color: #0e162a;
+  text-decoration: none;
+}
+
+.ExLink:hover {
+  text-decoration: underline;
+}

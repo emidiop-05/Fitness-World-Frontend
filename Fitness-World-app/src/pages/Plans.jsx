@@ -5,131 +5,176 @@ import style from "../pages/Plans.module.css";
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
 
 export default function Plans() {
-  const [targets, setTargets] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [muscle, setMuscle] = useState("");
-  const [group, setGroup] = useState("");
+  const [areas, setAreas] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [selectedArea, setSelectedArea] = useState("");
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
+  const [areasErr, setAreasErr] = useState("");
 
   useEffect(() => {
     (async () => {
       try {
-        const [tRes, gRes] = await Promise.all([
-          fetch(`${API_BASE}/api/exercises/targets`),
-          fetch(`${API_BASE}/api/exercises/groups`),
-        ]);
-        const tData = await tRes.json();
-        const gData = await gRes.json();
-        if (!tRes.ok) throw new Error(tData.error || "Failed to load targets");
-        if (!gRes.ok) throw new Error(gData.error || "Failed to load groups");
-        setTargets(Array.isArray(tData) ? tData : []);
-        setGroups(Array.isArray(gData) ? gData : []);
+        setErr(null);
+        const gRes = await fetch(`${API_BASE}/api/exercises/groups`);
+        const gJson = await gRes.json().catch(() => []);
+        setGroups(Array.isArray(gJson) ? gJson : []);
+
+        let a = [];
+        try {
+          const aRes = await fetch(`${API_BASE}/api/exercises/areas`);
+          if (aRes.ok) {
+            const aJson = await aRes.json();
+            a = Array.isArray(aJson) ? aJson : [];
+          } else {
+            setAreasErr("Body areas endpoint not available on the server.");
+          }
+        } catch {
+          setAreasErr("Could not load body areas.");
+        }
+        setAreas(a);
       } catch (e) {
-        setErr(e.message);
+        setErr("Could not load initial data.");
+        console.error(e);
       }
     })();
   }, []);
 
-  const loadTargetPlan = async () => {
-    if (!muscle) return;
+  async function generateGroupPlan() {
+    if (!selectedGroup) return;
     setLoading(true);
     setErr(null);
     setPlan(null);
     try {
-      const r = await fetch(
-        `${API_BASE}/api/exercises/plans/${encodeURIComponent(muscle)}`
+      const res = await fetch(
+        `${API_BASE}/api/exercises/plans/group/${encodeURIComponent(
+          selectedGroup
+        )}`
       );
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error || "Failed to load plan");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch plan");
       setPlan(data);
     } catch (e) {
       setErr(e.message);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const loadGroupPlan = async () => {
-    if (!group) return;
+  async function generateAreaPlan() {
+    if (!selectedArea) return;
     setLoading(true);
     setErr(null);
     setPlan(null);
     try {
-      const r = await fetch(
-        `${API_BASE}/api/exercises/plans/group/${encodeURIComponent(group)}`
+      const res = await fetch(
+        `${API_BASE}/api/exercises/plans/area/${encodeURIComponent(
+          selectedArea
+        )}`
       );
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error || "Failed to load group plan");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to fetch area plan");
       setPlan(data);
     } catch (e) {
       setErr(e.message);
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className={style.Container}>
       <h1 className={style.Title}>Training Plans</h1>
 
-      <div className={style.Controls}>
+      <div className={style.SelectRow}>
         <select
           className={style.Select}
-          value={group}
-          onChange={(e) => setGroup(e.target.value)}
+          value={selectedGroup}
+          onChange={(e) => setSelectedGroup(e.target.value)}
         >
           <option value="">Select muscle group…</option>
-          {groups.map((g) => (
-            <option key={g.group} value={g.group}>
-              {g.group}
-            </option>
-          ))}
+          {Array.isArray(groups) &&
+            groups.map((g) => (
+              <option key={g.group} value={g.group}>
+                {g.group}
+              </option>
+            ))}
         </select>
+
         <button
-          className={style.Button}
-          onClick={loadGroupPlan}
-          disabled={!group || loading}
+          className={style.Btn}
+          disabled={!selectedGroup || loading}
+          onClick={generateGroupPlan}
         >
-          {loading ? "Loading…" : "Generate Group Plan"}
+          {loading && selectedGroup ? "Loading…" : "Generate Group Plan"}
         </button>
       </div>
 
-      {err && <p className={style.Error}>{err}</p>}
+      <div className={style.SelectRow}>
+        <select
+          className={style.Select}
+          value={selectedArea}
+          onChange={(e) => setSelectedArea(e.target.value)}
+          disabled={areasErr !== "" || areas.length === 0}
+        >
+          <option value="">
+            {areasErr ? "Areas unavailable" : "Select body area…"}
+          </option>
+          {Array.isArray(areas) &&
+            areas.map((a) => (
+              <option key={a.area} value={a.area}>
+                {a.area}
+              </option>
+            ))}
+        </select>
+
+        <button
+          className={style.Btn}
+          disabled={!selectedArea || loading || areasErr !== ""}
+          onClick={generateAreaPlan}
+        >
+          {loading && selectedArea ? "Loading…" : "Generate Area Plan"}
+        </button>
+      </div>
+
+      {areasErr && (
+        <div className={style.Error}>
+          {areasErr} (Ask backend to deploy `/api/exercises/areas`)
+        </div>
+      )}
+      {err && <div className={style.Error}>{err}</div>}
 
       {plan && (
-        <div className={style.PlanContainer}>
-          <h2 className={style.PlanTitle}>
-            {(plan.group || plan.muscle)?.toUpperCase()} • 3-Day Plan
+        <section className={style.PlanSection}>
+          <h2 className={style.Subtitle}>
+            {plan.group
+              ? `Plan for ${plan.group}`
+              : plan.area
+              ? `Plan for ${plan.area}`
+              : "Training Plan"}
           </h2>
 
           {plan.days?.map((day) => (
             <div key={day.name} className={style.DayCard}>
               <h3 className={style.DayTitle}>{day.name}</h3>
-
-              {day.blocks?.map((ex) => (
-                <Link
-                  to={`/exercise/${encodeURIComponent(ex.id)}`}
-                  key={ex.id}
-                  className={style.ExerciseRowLink}
-                >
-                  <div className={style.ExerciseRow}>
-                    <div className={style.ExerciseInfo}>
-                      <div className={style.ExerciseName}>{ex.name}</div>
-                      <div className={style.ExerciseDetails}>
-                        {ex.equipment} • {ex.target}
-                      </div>
-                    </div>
-                    <div className={style.ExerciseMeta}>
-                      {ex.sets} x {ex.reps} • Rest {ex.restSec}s
-                    </div>
-                  </div>
-                </Link>
-              ))}
+              <ul className={style.ExerciseList}>
+                {day.blocks.map((ex) => (
+                  <li key={ex.id} className={style.ExerciseItem}>
+                    <Link
+                      to={`/exercise/${encodeURIComponent(ex.id)}`}
+                      className={style.ExLink}
+                    >
+                      {ex.name}
+                    </Link>{" "}
+                    — {ex.equipment} ({ex.sets}×{ex.reps})
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
-        </div>
+        </section>
       )}
     </div>
   );

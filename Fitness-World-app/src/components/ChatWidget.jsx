@@ -1,8 +1,16 @@
-// src/components/ChatWidget.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
+import { marked } from "marked";
 import styles from "./ChatWidget.module.css";
 
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+  headerIds: false,
+  mangle: false,
+});
+
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5005";
+const FRONT_MODEL = import.meta.env.VITE_HF_MODEL;
 
 export default function ChatWidget({
   title = "Ask Fitness World",
@@ -39,56 +47,71 @@ export default function ChatWidget({
     const content = input.trim();
     if (!content || sending) return;
 
-    const newMsgs = [...messages, { role: "user", content }];
-    setMessages(newMsgs);
+    const sys = messages.filter((m) => m.role === "system");
+    const nonSys = messages.filter((m) => m.role !== "system");
+    const MAX_TURNS = 10;
+    const trimmed = nonSys.slice(-MAX_TURNS);
+
+    const nextMsgs = [...sys, ...trimmed, { role: "user", content }];
+    setMessages(nextMsgs);
     setInput("");
     setSending(true);
 
     try {
       const url = `${API_BASE}/api/ai/chat`;
-      console.log("AI POST →", url);
+      const payload = {
+        messages: nextMsgs,
+        model: FRONT_MODEL || undefined,
+        max_tokens: 256,
+        temperature: 0.7,
+        top_p: 1,
+      };
 
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMsgs }),
+        body: JSON.stringify(payload),
       });
 
       const raw = await res.text();
-      console.log("AI status:", res.status, "raw:", raw);
-
       if (!res.ok) {
         let problem = raw;
         try {
           const parsed = JSON.parse(raw);
           problem = parsed.details || parsed.error || raw;
-        } catch {
-          // keep raw
-        }
+        } catch {}
+
+        const hint =
+          res.status === 401
+            ? " (check your HF token permissions for Inference Providers)"
+            : res.status === 429
+            ? " (rate limit—slow down requests or try another provider)"
+            : "";
         throw new Error(
-          typeof problem === "string" ? problem : JSON.stringify(problem)
+          `[${res.status}] ${
+            typeof problem === "string" ? problem : JSON.stringify(problem)
+          }${hint}`
         );
       }
 
-      // Accept either JSON { reply, model? } or plain text
-      let payload;
+      let payloadOut;
       try {
-        payload = JSON.parse(raw);
+        payloadOut = JSON.parse(raw);
       } catch {
-        payload = { reply: raw };
+        payloadOut = { reply: raw };
       }
 
-      let reply = (payload?.reply ?? "").toString().trim();
+      let reply = (payloadOut?.reply ?? "").toString().trim();
       if (!reply) reply = "I couldn't generate a response right now.";
 
-      // (optional) show model used if backend sends it
-      const modelUsed = payload?.model ? `\n\n_(model: ${payload.model})_` : "";
+      const modelUsed = payloadOut?.model
+        ? `\n\n*(model: ${payloadOut.model})*`
+        : "";
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: reply + modelUsed },
       ]);
     } catch (err) {
-      console.error("Chat error:", err);
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: `Error: ${err.message}` },
@@ -135,7 +158,15 @@ export default function ChatWidget({
                   m.role === "user" ? styles.user : styles.assistant
                 }`}
               >
-                {m.content}
+                {m.role === "assistant" ? (
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: marked.parse(m.content),
+                    }}
+                  />
+                ) : (
+                  m.content
+                )}
               </div>
             ))}
 

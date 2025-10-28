@@ -5,7 +5,6 @@
   z-index: 9999;
 }
 
-/* Floating button */
 .fab {
   width: 56px;
   height: 56px;
@@ -18,7 +17,6 @@
   cursor: pointer;
 }
 
-/* Panel */
 .panel {
   position: fixed;
   right: 20px;

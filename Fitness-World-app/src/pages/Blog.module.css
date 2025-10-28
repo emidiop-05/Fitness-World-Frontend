@@ -113,7 +113,6 @@
   line-height: 1.55;
   margin: 6px 0 8px;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
